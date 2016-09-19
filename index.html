@@ -39,7 +39,7 @@ var div = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-d3.json("/data/dubai_network.json", function(error, graph) {
+d3.json("/data/dubai_105.json", function(error, graph) {
   if (error) throw error;
 
   var link = svg.append("g")
