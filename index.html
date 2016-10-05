@@ -1,5 +1,8 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <meta charset="utf-8">
+<head>
+</head>
+<body>
 <style>
 .links line {
   stroke: #999;
@@ -14,32 +17,33 @@ div.tooltip {
     text-align: center;
     width: auto;
     height: auto;
-    padding: 2px;
+    padding: 10px;
     font: 12px sans-serif;
     background: lightsteelblue;
-    border: 0px;
+    border: 1px;
     border-radius: 8px;
     pointer-events: none;
 }
 </style>
-<svg width="960" height="600"></svg>
+<h1>Dubai Meetup groups</h1>
+<svg width="1250" height="1250"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script type='text/javascript' src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"> </script>
 <script>
 var svg = d3.select("svg"),
-width = +svg.attr("width"),
-height = +svg.attr("height");
-var color = d3.scaleOrdinal(d3.schemeCategory20);
+  width = +svg.attr("width"),
+  height = +svg.attr("height");
+var color = d3.scaleOrdinal(d3.schemeCategory20c);
 var simulation = d3.forceSimulation()
-  .force("link", d3.forceLink().id(function(d) { return d.id; }))
-  .force("charge", d3.forceManyBody())
-  .force("center", d3.forceCenter(width / 2, height / 2));
+  .force("link", d3.forceLink().id(function(d) {console.log(d); return d.id; }))
+  .force("charge", d3.forceManyBody().strength(-50))
+  .force("center", d3.forceCenter(width / 2, height / 4));
 // Define the div for the tooltip
 var div = d3.select("body").append("div")
     .attr("class", "tooltip")
-    .style("opacity", 0);
+    .style("opacity", 1);
 
-d3.json("/data/dubai_105.json", function(error, graph) {
+d3.json("/data/dubai_105_groups.json", function(error, graph) {
   if (error) throw error;
 
   var link = svg.append("g")
@@ -47,7 +51,7 @@ d3.json("/data/dubai_105.json", function(error, graph) {
     .selectAll("line")
     .data(graph.links)
     .enter().append("line")
-    .attr("stroke-width", function(d) { return Math.sqrt(d.attributes.prop_weight); });
+    .attr("stroke-width", function(d) { return Math.sqrt(d.attributes.prop_weight*10); });
 
   var node = svg.append("g")
     .attr("class", "nodes")
@@ -55,7 +59,8 @@ d3.json("/data/dubai_105.json", function(error, graph) {
     .data(graph.nodes)
     .enter().append("circle")
     .attr("r", 5)
-    .attr("fill",function(d,i){return color(i);})
+    .attr("fill",function(d){console.log(d.attributes.group); return color(d.attributes.group);})
+    .style("stroke", "grey")
     .call(d3.drag()
     .on("start", dragstarted)
     .on("drag", dragged)
@@ -64,7 +69,9 @@ d3.json("/data/dubai_105.json", function(error, graph) {
       div.transition()
           .duration(200)
           .style("opacity", 0.9);
-      div .html(d.attributes.name)
+      div .html("<b>" + "Group Name:\t" + "</b>" +
+                d.attributes.name + "<br/>" +
+                "<b>" + "Top Community:\t" + "</b>" + d.attributes.top_community)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
       })
@@ -113,3 +120,4 @@ function dragended(d) {
   d.fy = null;
 }
 </script>
+</body>
